@@ -1,26 +1,44 @@
 import React from 'react';
-import logo from './logo.svg';
+import {connect} from 'react-redux';
+import {Router, Link, Switch, Route} from 'react-router-dom';
+import {createBrowserHistory} from 'history';
+import Game from './components/pages/Game';
+import Questions from './components/pages/Questions';
+import { addQuestions } from './store/actions/questions';
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const history = createBrowserHistory();
+
+class App extends React.Component<any,any> {
+  componentWillMount() {
+    if(localStorage.getItem('questions')) {
+      const questions = JSON.parse(localStorage.getItem('questions') as string);
+      this.props.dispatch(addQuestions(questions));
+    }
+  }
+
+  render() {
+    return (
+      <Router history={history}>
+        <div className="container">
+          <div className="my-5 d-flex justify-content-around">
+            <Link to="/">Game</Link>
+            <Link to="/questions">Questions</Link>
+          </div>
+
+          <Switch>
+            <Route path="/questions">
+              <Questions />
+            </Route>
+            <Route path="/">
+              <Game />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    );
+  }
 }
 
-export default App;
+export default connect()(App);
